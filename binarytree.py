@@ -1,35 +1,52 @@
+class NoException(Exception):
+    """Classe base que implementa as exceções"""
+    pass
+
+class PosicaoNaoVazia(NoException):
+    pass
+
+class ArvoreVaziaException(Exception):
+    pass
+
 '''
 Classe para instanciação de nós que vão ficar na memória
 '''
-
 class Node:
+    """Classe que implementa os nós da Árvore Binária"""
     def __init__(self,data:object):
+        """Construtor padrão que inicializa o Nó"""
         self.__data = data
         self.__leftChild = None
         self.__rightChild = None
 
     @property
     def data(self)->object:
+        """Método que retorna o dado da árvore binária"""
         return self.__data
 
     @data.setter
     def data(self, newData:object):
+        """Método que insere um novo dado na árvore binária"""
         self.__data = newData
 
     @property
     def leftChild(self)->'Node':
+        """Método que retorna o nó esquerdo da árvore binária"""
         return self.__leftChild
 
     @leftChild.setter
     def leftChild(self, newLeftChild:object):
+        """Método que insere um nó esquerdo na árvore binária"""
         self.__leftChild = newLeftChild
 
     @property
     def rightChild(self)->'Node':
+        """Método que retorna o nó direito da árvore binária"""
         return self.__rightChild
 
     @rightChild.setter
     def rightChild(self, newRightChild:'Node'):
+        """Método que insere um nó direito na árvore binária"""
         self.__rightChild = newRightChild
 
     def insertLeft(self, data:object):
@@ -41,60 +58,129 @@ class Node:
             self.__rightChild = Node(data)
 
     def __str__(self):
+        """Método que retorna a representação de string de um objeto"""
         return str(self.__data)
 
     def hasLeftChild(self)->bool:
+        """Método que retorna se tem um nó esquerdo na árvore binária"""
         return self.__leftChild != None
 
     def hasRightChild(self)->bool:
+        """Método que retorna se tem um nó direito na árvore binária"""
         return self.__rightChild != None
-        
 	    
 '''
-Esta classe é um exemplo de um da estrutura de Arvore Binária implementada
-como uma classe.
+Classe para a instanciação de Árvores Binárias
 '''
 class BinaryTree:
-    # constructor initializes an empty Tree of integers
-    def __init__(self, data_root:object):
-        self.root = Node(data_root)
-        self.cursor = self.root
+    # constructor that initializes an empty Tree 
+    def __init__(self, data_root):
+        """Construtor padrão que inicializa a Árvore vazia"""
+        self.__root = Node(data_root)
+        # O cursor é um apontador usado para navegar na árvore (sem mexer no root)
+        self.__cursor = self.__root
 
     def getRoot(self)->'Node':
-        return self.root
+        """Método que obtem a referência para o nó 'root'"""
+        return self.__root
 
-    def downLeft(self)->'Node':
-        if(self.cursor.hasLeftChild()): 
-            self.cursor = self.cursor.leftChild
-            return self.cursor
-        else:
+    def getNode(self, key): 
+        """"Método que obtem a referência para os nós"""
+        return self.__getNode(key, self.__root)
+
+    def __getNode(self, key, node:Node) -> Node:
+        """"Método privado que obtem a referência para os nós"""
+        if node == None:
             return None
-            
-    def downRight(self)->'Node':
-        if(self.cursor.hasRightChild()): 
-            self.cursor = self.cursor.rightChild
-            return self.cursor
+        if node.data == key:
+            return node
+        elif self.__getNode(key, node.leftChild):
+            return self.__getNode(key, node.leftChild)
         else:
+            return self.__getNode(key, node.rightChild)
+    
+    def addDomain(self, key: list) -> None:
+        if self.__root is None:
+            self.__root = Node(key[0])
+        else:
+            self.__addDomain(key, self.__root)
+
+    def __addDomain(self, key: list, node: Node):
+
+        if node.data == key[0]:
+            node.data = self.__root
+            #tem que procurar o proximo no para ir 
+            # a esquerda e a direita
+            if node.leftChild is not None and node.leftChild.data == key[1]:
+                # desce recursivamente para o lado esquerdo
+                node.data = node.addLeft()
+                pass
+            elif node.rightChild is not None and node.rightChild.data == key[1]:
+                # desce recursivamente para o lado direito
+                node.data = node.addRight()
+                pass
+            else:
+                # já econtrou o nó pai de inserção.
+                # entao verifica se vai adicionar a direita
+                # ou a esquerdareturn True
+                pass
+        
+        
+
+        if node is None:
             return None
 
-    def addLeftChild(self, dado:object):
-        if(not self.cursor.hasLeftChild()):
-            self.cursor.leftChild = Node(dado)
+        #node2 = self.getNode(key[0]) -> com get node não da certo!
+        # (a) Se a url a adicionar é louise/alex/fernando
+        #     para poder inserir fernando é necessário que
+        #     haja uma raiz 'louise' e que 'louise' tenha
+        #     um filho esquerdo ou direito 'alex'
+        # (b) Entao, acessa o nó raiz (louise) e caminha
+        #     para o nó 'alex'
+        # (c) nesse caminhamento, a cada nó visitado, a 
+        #     carga do nó tem que corresponder à parte
+        #     da url verificada
+        # 
+        # 
 
-    def addRightChild(self, dado:object):
-        if(not self.cursor.hasRightChild()):
-            self.cursor.rightChild = Node(dado)
+    def addLeft(self, key ,data):
+        """Método que adiciona um nó esquerdo na árvore binária"""
+        key = self.getNode(key)
 
-    def resetCursor(self):
-        self.cursor = self.root
+        if key is None:
+            return False
 
-    def getCursor(self)->'Node':
-        return self.cursor
+        if key.leftChild == None:
+            key.insertLeft(data)
+            return True
+        else:
+            return False
+    
+    def addRight(self, key ,data):
+        """Método que adiciona um nó direito na árvore binária"""
+        key = self.getNode(key)
 
-    def search(self, chave:object )->'Node':
-        return self.__searchData(chave, self.root)
+        if key is None:
+            return False
+
+        if key.rightChild == None:
+            key.insertRight(data)
+            return True
+        else:
+            return False
+
+    def search(self, chave:object )->bool:
+        '''Realiza uma busca na árvore pelo nó cuja carga é igual à chave
+           passada como argumento.
+           Returns
+           ---------
+           True: caso a chave seja encontrada na árvore
+           False: caso a chave não esteja na árvore
+        '''
+        return self.__searchData(chave, self.__root)
     
     def __searchData(self, chave, node):
+        """"Método privado que realiza busca na árvore pelo nó cuja carga é igual à chave passada como argumento"""
         if (node == None):
             return False # Nao encontrou a chave
         if ( chave == node.data):
@@ -105,98 +191,60 @@ class BinaryTree:
             return self.__searchData( chave, node.rightChild)
 
     def preorderTraversal(self):
-        self.__preorder(self.root)
-
-    def inorderTraversal(self):
-        self.__inorder(self.root)
-
-    def postorderTraversal(self):
-        self.__postorder(self.root)
+        """Método que exibe os nós da árvore com percurso em pré-ordem"""
+        self.__preorder(self.__root)
         
     def __preorder(self, node):
+        """Método privado que exibe os nós da árvore com percurso em pré-ordem"""
         if( node == None):
             return
         print(f'{node.data} ',end='')
         self.__preorder(node.leftChild)
         self.__preorder(node.rightChild)
+    
+    def viewtree(self):
+        """Método que exibe a árvore binária através do comando especial #viewtree"""
+        ancestral = list()
+        self.__viewtree(self.__root, ancestral)
 
-    def __inorder(self, node):
-        if( node == None):
-            return
-        self.__inorder(node.leftChild)
-        print(f'{node.data} ',end='')
-        self.__inorder(node.rightChild)
-
-    def __postorder(self, node):
-        if( node == None):
-            return
-        self.__postorder(node.leftChild)
-        self.__postorder(node.rightChild)
-        print(f'{node.data} ',end='')
-
-    def deleteTree(self):
-        # garbage collector fará o trabalho de eliminação dos nós
-        # abandonados 
-        self.root = None
-
-    # o cursor tem que estar posicionado no nó pai
-    # do nó que vai ser removido
-    def deleteNode(self, key:object):
-        self.__deleteNode(self.cursor, key)
-
-
-    def __deleteNode(self,root, key):
-
-        if root is None: 
-            return
-        elif root.leftChild == None and root.rightChild == None:
+    def __viewtree(self, node, ancestral):
+        """Método privado que exibe a árvore binária através do comando especial #viewtree"""
+        # louise
+        # louise/fernando
+        # louise/fernando/alex
+        # louise/caio
+        # str = ''
+        '''
+                           louise
+                         //      \\
+                   fernando        caio
+                    //     \\         \\
+               damires      Alex        tsi
+        '''     
+        if(node == None):
             return
         
-        if root.leftChild == None:
-            if root.rightChild.data == key:
-                root.rightChild = None
-        elif root.rightChild == None:
-            if root.leftChild.data == key:
-                root.leftChild = None
+        urls = ""
+        for i in ancestral:
+            urls = urls + i + "/"
+
+        print(f"{urls}{node.data}")
+        ancestral.append(node.data)
+        self.__viewtree(node.leftChild, ancestral)
+        self.__viewtree(node.rightChild, ancestral)
+        ancestral.pop()
+
+    def match(self, key):
+        """Método que compara os nós da árvore binária com o input do usuário"""
+        paths = key.split("/")
+        existe_url = False
+        for path in paths:
+            existe_url = self.search(path)
+            if not existe_url:
+                break
+
+        return existe_url
 
 
-if __name__ == '__main__':  
-    tree = BinaryTree(30)
-    tree.addLeftChild(15)
-    tree.addRightChild(17)
-    print(tree.downLeft())
-    tree.addLeftChild(70)
-    tree.resetCursor()
-    print(tree.downRight())
-    tree.addLeftChild(5)
-    tree.addRightChild(52)
-    print(tree.downLeft())
-    tree.addRightChild(77)
 
-    print('Root:',tree.getRoot())
-    print('Cursor:',tree.getCursor())
-
-    tree.preorderTraversal()
-    print()
-    tree.inorderTraversal()
-    print()
-    tree.postorderTraversal()
-    chave = 150
-    if( tree.search( chave )):
-        print('\nChave',chave,'está na árvore')
-    else:
-        print('\nChave',chave,'NÃO está na árvore')
-
-
-    print('Cursor:',tree.getCursor())
-    chave = 77
-    tree.preorderTraversal()
-    tree.deleteNode(chave)
-    tree.preorderTraversal()
-    print()
-    print()
-    chave = 70
-    tree.preorderTraversal()
-    print()
-    tree.deleteNode(chave)
-    tree.preorderTraversal()
+        
