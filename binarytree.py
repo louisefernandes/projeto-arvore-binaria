@@ -71,8 +71,6 @@ class Node:
 	    
 '''
 Classe para a instanciação de Árvores Binárias
-Autor: Alex Sandro
-Modificado por: Louise Fernandes, Caio André e Fernando Luiz 
 '''
 class BinaryTree:
     def __init__(self, data_root):
